@@ -1,23 +1,35 @@
 
 const apiKey = "c8dedd09";
 var movieId = 0;
-
+var active = 0;
 var doc = document.getElementById("input_search")
 doc.addEventListener("click",getInputValue)
 setInterval(function(){
   document.getElementById("input_search").disabled = false;
   document.getElementById("input_search").style.color ='green'
 },10000)
+
+function clickPress(event) {
+  if (event.keyCode == 13) {
+    getInputValue()
+  }
+}
+var film;
+var page = 1 
 function getInputValue(){
+  active = 0;
   var movie = document.getElementById("input_movie").value;
-  
-  request(movie)
-  console.log(movie)
+  page = 1
+  film = movie
+  request(movie,page)
+  page +=1;
 };
 
-const request = (movie) => {
-  const requestUrl = `https://www.omdbapi.com/?s=${encodeURIComponent(movie)}&type=movie&apikey=${apiKey}&page=1-100`;
+const request = (movie,page) => {
+  const requestUrl = `https://www.omdbapi.com/?s=${encodeURIComponent(movie)}&type=movie&apikey=${apiKey}&page=${page}`;
+  page +=1;
   fetchOmdbApi(requestUrl);
+  
 };
 
 
@@ -74,16 +86,27 @@ async function fetchOmdbByTitle(requestUrl, title, poster) {
 
 const displayMovie = (title,poster,response) =>{
 var selector = document.getElementById('movie')
+if (active == 0){
 selector.insertAdjacentHTML("afterend", `  
-<div class="column">
-  <img src="${poster}>" </div>
-  <div class="column">
+${selector.innerHTML=""}
+<div class="wrapper">
+  <div class="left">
+    <img src="${poster}>" 
+  </div>
+  <div class="right">
+    <div class="top">
     <h2>${title}</h2>
     <p>${response.Released}</p>
-
-    <div class="btn">
-      <button class="myBtn">Read More</button>
     </div>
+    <div class="bottom">
+      <div class="btn">
+        <button class="myBtn btn btn-primary">Read More</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
     <div id="myModal" class="modal">
       <div class="modal-content">
@@ -95,12 +118,49 @@ selector.insertAdjacentHTML("afterend", `
         </div>
       </div>
     </div>
+    
 
-  </div>
 
 </div>
 
-`);
+`)}else{ 
+selector.insertAdjacentHTML("beforebegin", `  
+${selector.innerHTML=""}
+<div class="wrapper">
+  <div class="left">
+    <img src="${poster}>" 
+  </div>
+  <div class="right">
+    <div class="top">
+    <h2>${title}</h2>
+    <p>${response.Released}</p>
+    </div>
+    <div class="bottom">
+      <div class="btn">
+        <button class="myBtn btn btn-primary">Read More</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-body">
+          <img src="${poster}">
+          <h2>${title}</h2>
+          <p>${response.Released}</p>
+          <p> ${response.Plot} </p>
+        </div>
+      </div>
+    </div>
+    
+
+
+</div>`
+
+)}
 
 scriptDisplayMovie()
 
@@ -141,7 +201,7 @@ var decreasingColor = "rgba(190, 40, 40, ratio)";
 
 
 window.addEventListener("load", function(event) {
-  boxElement = document.querySelector("#movie");
+  boxElement = document.querySelector("#scrollArea");
 
   createObserver();
 }, false);
@@ -174,10 +234,11 @@ function buildThresholdList() {
 function handleIntersect(entries, observer) {
   entries.forEach(function(entry) {
     if (entry.intersectionRatio > prevRatio) {
-      entry.target.style.backgroundColor = increasingColor.replace("ratio", entry.intersectionRatio);
-    } else {
-      entry.target.style.backgroundColor = decreasingColor.replace("ratio", entry.intersectionRatio);
-    }
+      console.log(page)
+      console.log(page)
+    //active = 1;
+     //request(film,page)
+    } 
 
     prevRatio = entry.intersectionRatio;
   });
