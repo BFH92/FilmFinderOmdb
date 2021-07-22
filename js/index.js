@@ -50,7 +50,7 @@ async function showMovie(data){
       title = element.Title;
       poster = element.Poster;
       imdbID = element.imdbID;
-      const requestUrl = `http://www.omdbapi.com/?i=${imdbID}&type=movie&type=series&apikey=${apiKey}`;
+      const requestUrl = `https://www.omdbapi.com/?i=${imdbID}&type=movie&type=series&apikey=${apiKey}`;
       fetchOmdbByTitle(requestUrl, title, poster, imdbID);
     });
   };
