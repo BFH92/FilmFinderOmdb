@@ -1,20 +1,22 @@
-//require('dotenv').config();
-//require('dotenv').config()
-//import {OMDB_API_KEY} from './js/apikey.js';
+
 const apiKey = "19817ab2";
 var movieId = 0;
 
 var doc = document.getElementById("input_search")
 doc.addEventListener("click",getInputValue)
-
+setInterval(function(){
+  document.getElementById("input_search").disabled = false;
+  document.getElementById("input_search").style.color ='green'
+},10000)
 function getInputValue(){
   var movie = document.getElementById("input_movie").value;
+  
   request(movie)
   console.log(movie)
 };
 
 const request = (movie) => {
-  const requestUrl = `http://www.omdbapi.com/?s=${encodeURIComponent(movie)}&type=movie&apikey=${apiKey}&page=1-100`;
+  const requestUrl = `https://www.omdbapi.com/?s=${encodeURIComponent(movie)}&type=movie&apikey=${apiKey}&page=1-100`;
   fetchOmdbApi(requestUrl);
 };
 
@@ -27,9 +29,17 @@ async function fetchOmdbApi(requestUrl) {
       return data;
     })
     .catch((error) => console.error("Oula", error))
-    .then((data) => showMovie(data));
-    
+    .then((data) => {
+      if(data.Search != undefined){
+        document.getElementById("input_search").disabled = true;
+        document.getElementById("input_search").style.color ='red';
+        showMovie(data);
+      }else{
+        alert("la requête est invalide")
+      };
+    });
 }
+
 
 async function showMovie(data){
   var title;
@@ -102,27 +112,73 @@ const scriptDisplayMovie =()=>{
   
   var modal = document.getElementById("myModal");
   
-  // Get the button that opens the modal
   var btn = document.querySelector('button');
   
-  // Get the <span> element that closes the modal
   var span = document.getElementsByClassName("modal")[0];
   
-  // When the user clicks the button, open the modal 
   btn.onclick = function() {
     modal.style.display = "grid";
   }
   
-  // When the user clicks on <span> (x), close the modal
   span.onclick = function() {
     modal.style.display = "none";
   }
   
-  // When the user clicks anywhere outside of the modal, close it
   window.onclick = function(event) {
     if (event.target == modal) {
       modal.style.display = "none";
     }
   }
   
+}
+
+var numSteps = 20.0;
+
+var boxElement;
+var prevRatio = 0.0;
+var increasingColor = "rgba(40, 40, 190, ratio)";
+var decreasingColor = "rgba(190, 40, 40, ratio)";
+
+
+window.addEventListener("load", function(event) {
+  boxElement = document.querySelector("#movie");
+
+  createObserver();
+}, false);
+
+function createObserver() {
+  var observer;
+
+  var options = {
+    root: null,
+    rootMargin: "0px",
+    threshold: buildThresholdList()
+  };
+
+  observer = new IntersectionObserver(handleIntersect, options);
+  observer.observe(boxElement);
+}
+
+function buildThresholdList() {
+  var thresholds = [];
+
+  for (var i=1.0; i<=numSteps; i++) {
+    var ratio = i/numSteps;
+    thresholds.push(ratio);
+  }
+
+  thresholds.push(0);
+  return thresholds;
+}
+
+function handleIntersect(entries, observer) {
+  entries.forEach(function(entry) {
+    if (entry.intersectionRatio > prevRatio) {
+      entry.target.style.backgroundColor = increasingColor.replace("ratio", entry.intersectionRatio);
+    } else {
+      entry.target.style.backgroundColor = decreasingColor.replace("ratio", entry.intersectionRatio);
+    }
+
+    prevRatio = entry.intersectionRatio;
+  });
 }

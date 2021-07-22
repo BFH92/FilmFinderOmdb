@@ -1,3 +1,13 @@
+.head{
+  position: fixed;
+  top:0;
+  width: 100%;
+  background-color:#ffff;
+}
+
+.row{
+  margin-top: 130px;
+}
 .modal {
   display: none; /* Hidden by default */
   place-items: center;
@@ -86,19 +96,9 @@ input[type="submit"]:hover {
   cursor: pointer;
 }
 
-.modal-header {
-  padding: 2px 16px;
-  background-color: #5cb85c;
-  color: white;
-}
 
 .modal-body {padding: 2px 16px;}
 
-.modal-footer {
-  padding: 2px 16px;
-  background-color: #5cb85c;
-  color: white;
-}
 
 /* Add Animation */
 @-webkit-keyframes slideIn {
